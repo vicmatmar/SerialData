@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ManufacturingStore_v2Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="EuiList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EUI" Type="nchar" MaxLength="16" Nullable="false" />
+          <Property Name="ProductionSiteId" Type="int" Nullable="false" />
+          <Property Name="VendorEui" Type="nchar" MaxLength="16" />
+        </EntityType>
+        <EntityType Name="LowesHubs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="mac_id" Type="int" Nullable="false" />
+          <Property Name="smt_serial" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="hw_ver" Type="int" Nullable="false" />
+          <Property Name="customer_id" Type="int" Nullable="false" />
+          <Property Name="date" Type="datetime" Nullable="false" />
+          <Property Name="lowes_serial" Type="bigint" Nullable="false" />
+          <Property Name="hub_id" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="operator_id" Type="int" />
+          <Property Name="test_station_id" Type="int" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ModelString" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Released" Type="bit" />
+          <Property Name="BoardId" Type="int" Nullable="false" />
+          <Property Name="CreateDate" Type="datetime" Nullable="false" />
+          <Property Name="SerialNumberCode" Type="nvarchar" MaxLength="8" Nullable="false" />
+          <Property Name="ZigbeeModelString" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ExtensionId" Type="int" Nullable="false" />
+          <Property Name="SKU" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CurrentTest" Type="bit" Nullable="false" />
+          <Property Name="ModelEncodingNumber" Type="int" />
+          <Property Name="ZplFile" Type="nvarchar" MaxLength="255" />
+          <Property Name="EnableReadProtectOnDevice" Type="bit" Nullable="false" />
+          <Property Name="BoxLabelName" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="SerialNumber">
+          <Key>
+            <PropertyRef Name="SerialNumberId" />
+          </Key>
+          <Property Name="SerialNumberId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SerialNumber" Type="int" Nullable="false" />
+          <Property Name="ProductId" Type="int" Nullable="false" />
+          <Property Name="EuiId" Type="int" Nullable="false" />
+          <Property Name="CreateDate" Type="datetime" Nullable="false" />
+          <Property Name="TesterId" Type="int" Nullable="false" />
+          <Property Name="UpdateDate" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_SerialNumber_EuiList">
+          <End Role="EuiList" Type="Self.EuiList" Multiplicity="1" />
+          <End Role="SerialNumber" Type="Self.SerialNumber" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EuiList">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SerialNumber">
+              <PropertyRef Name="EuiId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SerialNumber_Product">
+          <End Role="Product" Type="Self.Product" Multiplicity="1" />
+          <End Role="SerialNumber" Type="Self.SerialNumber" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SerialNumber">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ManufacturingStore_v2ModelStoreContainer">
+          <EntitySet Name="EuiList" EntityType="Self.EuiList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LowesHubs" EntityType="Self.LowesHubs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SerialNumber" EntityType="Self.SerialNumber" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_SerialNumber_EuiList" Association="Self.FK_SerialNumber_EuiList">
+            <End Role="EuiList" EntitySet="EuiList" />
+            <End Role="SerialNumber" EntitySet="SerialNumber" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SerialNumber_Product" Association="Self.FK_SerialNumber_Product">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="SerialNumber" EntitySet="SerialNumber" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ManufacturingStore_v2Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="SerialNumber">
+          <Key>
+            <PropertyRef Name="SerialNumberId" />
+          </Key>
+          <Property Name="SerialNumberId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SerialNumber1" Type="Int32" Nullable="false" />
+          <Property Name="ProductId" Type="Int32" Nullable="false" />
+          <Property Name="EuiId" Type="Int32" Nullable="false" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TesterId" Type="Int32" Nullable="false" />
+          <Property Name="UpdateDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="EuiList" Relationship="ManufacturingStore_v2Model.FK_SerialNumber_EuiList" FromRole="SerialNumber" ToRole="EuiList" />
+          <NavigationProperty Name="Product" Relationship="ManufacturingStore_v2Model.FK_SerialNumber_Product" FromRole="SerialNumber" ToRole="Product" />
+        </EntityType>
+        <EntityContainer Name="ManufacturingStore_v2Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="SerialNumbers" EntityType="Self.SerialNumber" />
+          <EntitySet Name="EuiLists" EntityType="ManufacturingStore_v2Model.EuiList" />
+          <AssociationSet Name="FK_SerialNumber_EuiList" Association="ManufacturingStore_v2Model.FK_SerialNumber_EuiList">
+            <End Role="EuiList" EntitySet="EuiLists" />
+            <End Role="SerialNumber" EntitySet="SerialNumbers" />
+          </AssociationSet>
+          <EntitySet Name="Products" EntityType="ManufacturingStore_v2Model.Product" />
+          <AssociationSet Name="FK_SerialNumber_Product" Association="ManufacturingStore_v2Model.FK_SerialNumber_Product">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="SerialNumber" EntitySet="SerialNumbers" />
+          </AssociationSet>
+          <EntitySet Name="LowesHubs" EntityType="ManufacturingStore_v2Model.LowesHub" />
+        </EntityContainer>
+        <EntityType Name="EuiList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EUI" Type="String" Nullable="false" MaxLength="16" FixedLength="true" Unicode="true" />
+          <Property Name="ProductionSiteId" Type="Int32" Nullable="false" />
+          <Property Name="VendorEui" Type="String" MaxLength="16" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="SerialNumbers" Relationship="ManufacturingStore_v2Model.FK_SerialNumber_EuiList" FromRole="EuiList" ToRole="SerialNumber" />
+        </EntityType>
+        <Association Name="FK_SerialNumber_EuiList">
+          <End Type="ManufacturingStore_v2Model.EuiList" Role="EuiList" Multiplicity="1" />
+          <End Type="ManufacturingStore_v2Model.SerialNumber" Role="SerialNumber" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EuiList">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SerialNumber">
+              <PropertyRef Name="EuiId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ModelString" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Released" Type="Boolean" />
+          <Property Name="BoardId" Type="Int32" Nullable="false" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="SerialNumberCode" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="true" />
+          <Property Name="ZigbeeModelString" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ExtensionId" Type="Int32" Nullable="false" />
+          <Property Name="SKU" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CurrentTest" Type="Boolean" Nullable="false" />
+          <Property Name="ModelEncodingNumber" Type="Int32" />
+          <Property Name="ZplFile" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="EnableReadProtectOnDevice" Type="Boolean" Nullable="false" />
+          <Property Name="BoxLabelName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="SerialNumbers" Relationship="ManufacturingStore_v2Model.FK_SerialNumber_Product" FromRole="Product" ToRole="SerialNumber" />
+        </EntityType>
+        <Association Name="FK_SerialNumber_Product">
+          <End Type="ManufacturingStore_v2Model.Product" Role="Product" Multiplicity="1" />
+          <End Type="ManufacturingStore_v2Model.SerialNumber" Role="SerialNumber" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SerialNumber">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="LowesHub">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="mac_id" Type="Int32" Nullable="false" />
+          <Property Name="smt_serial" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="hw_ver" Type="Int32" Nullable="false" />
+          <Property Name="customer_id" Type="Int32" Nullable="false" />
+          <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="lowes_serial" Type="Int64" Nullable="false" />
+          <Property Name="hub_id" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="operator_id" Type="Int32" />
+          <Property Name="test_station_id" Type="Int32" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ManufacturingStore_v2ModelStoreContainer" CdmEntityContainer="ManufacturingStore_v2Entities">
+          <EntitySetMapping Name="SerialNumbers">
+            <EntityTypeMapping TypeName="ManufacturingStore_v2Model.SerialNumber">
+              <MappingFragment StoreEntitySet="SerialNumber">
+                <ScalarProperty Name="SerialNumberId" ColumnName="SerialNumberId" />
+                <ScalarProperty Name="SerialNumber1" ColumnName="SerialNumber" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="EuiId" ColumnName="EuiId" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="TesterId" ColumnName="TesterId" />
+                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EuiLists">
+            <EntityTypeMapping TypeName="ManufacturingStore_v2Model.EuiList">
+              <MappingFragment StoreEntitySet="EuiList">
+                <ScalarProperty Name="VendorEui" ColumnName="VendorEui" />
+                <ScalarProperty Name="ProductionSiteId" ColumnName="ProductionSiteId" />
+                <ScalarProperty Name="EUI" ColumnName="EUI" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Products">
+            <EntityTypeMapping TypeName="ManufacturingStore_v2Model.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="BoxLabelName" ColumnName="BoxLabelName" />
+                <ScalarProperty Name="EnableReadProtectOnDevice" ColumnName="EnableReadProtectOnDevice" />
+                <ScalarProperty Name="ZplFile" ColumnName="ZplFile" />
+                <ScalarProperty Name="ModelEncodingNumber" ColumnName="ModelEncodingNumber" />
+                <ScalarProperty Name="CurrentTest" ColumnName="CurrentTest" />
+                <ScalarProperty Name="SKU" ColumnName="SKU" />
+                <ScalarProperty Name="ExtensionId" ColumnName="ExtensionId" />
+                <ScalarProperty Name="ZigbeeModelString" ColumnName="ZigbeeModelString" />
+                <ScalarProperty Name="SerialNumberCode" ColumnName="SerialNumberCode" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="BoardId" ColumnName="BoardId" />
+                <ScalarProperty Name="Released" ColumnName="Released" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="ModelString" ColumnName="ModelString" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LowesHubs">
+            <EntityTypeMapping TypeName="ManufacturingStore_v2Model.LowesHub">
+              <MappingFragment StoreEntitySet="LowesHubs">
+                <ScalarProperty Name="test_station_id" ColumnName="test_station_id" />
+                <ScalarProperty Name="operator_id" ColumnName="operator_id" />
+                <ScalarProperty Name="hub_id" ColumnName="hub_id" />
+                <ScalarProperty Name="lowes_serial" ColumnName="lowes_serial" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="customer_id" ColumnName="customer_id" />
+                <ScalarProperty Name="hw_ver" ColumnName="hw_ver" />
+                <ScalarProperty Name="smt_serial" ColumnName="smt_serial" />
+                <ScalarProperty Name="mac_id" ColumnName="mac_id" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

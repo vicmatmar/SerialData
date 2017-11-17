@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="0b751f4a39b141e69ffb8346d3ff2b69" Name="Diagram1">
+        <EntityTypeShape EntityType="ManufacturingStore_v2Model.SerialNumber" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ManufacturingStore_v2Model.EuiList" Width="1.5" PointX="0.75" PointY="4" />
+        <AssociationConnector Association="ManufacturingStore_v2Model.FK_SerialNumber_EuiList" />
+        <EntityTypeShape EntityType="ManufacturingStore_v2Model.Product" Width="1.5" PointX="3.25" PointY="0.75" />
+        <AssociationConnector Association="ManufacturingStore_v2Model.FK_SerialNumber_Product" />
+        <EntityTypeShape EntityType="ManufacturingStore_v2Model.LowesHub" Width="1.5" PointX="5.375" PointY="0.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
