@@ -81,9 +81,8 @@ namespace SerialData
             List<DataItem> items = new List<DataItem>();
             using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
             {
-                var serials = cx.LowesHubs.OrderByDescending(s => s.date).GroupBy(s => s.smt_serial);
-                var serial_array = serials.Select(s => s.FirstOrDefault()).Select(s => new { s.smt_serial, s.date });
-                foreach (var s in serial_array)
+                var serials = cx.LowesHubs.GroupBy(s => s.smt_serial).Select(s => s.OrderByDescending(x => x.date).FirstOrDefault()).Select(s => new { s.smt_serial, s.date });
+                foreach (var s in serials)
                 {
                     DataItem item = new DataItem();
                     item.Serial = s.smt_serial;
@@ -125,6 +124,16 @@ namespace SerialData
                 sku = cx.Products.Where(s => s.Id == product_id).Single().SKU;
             }
             return sku;
+        }
+
+        static public int GetProductId(string product_sku)
+        {
+            int id = -1;
+            using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
+            {
+                id = cx.Products.Where(s => s.SKU == product_sku).Single().Id;
+            }
+            return id;
         }
 
     }
