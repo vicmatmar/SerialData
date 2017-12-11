@@ -28,7 +28,7 @@ namespace SerialData
             return style;
         }
 
-        static public DataItem[] GetDataItems(int product_id, int site_id)
+        static public DataItem[] GetDataItems(int product_id, int site_id, DateTime fromDateTime)
         {
             DataItem[] items;
 
@@ -36,13 +36,13 @@ namespace SerialData
             switch (table_style)
             {
                 case Product_table_Stlye.Normal:
-                    items = GetNormalDataItems(product_id, site_id);
+                    items = GetNormalDataItems(product_id, site_id, fromDateTime);
                     break;
                 case Product_table_Stlye.Lowes:
-                    items = GetLowesDataItems(site_id);
+                    items = GetLowesDataItems(site_id, fromDateTime);
                     break;
                 default:
-                    items = GetNormalDataItems(product_id, site_id);
+                    items = GetNormalDataItems(product_id, site_id, fromDateTime);
                     break;
 
             }
@@ -51,12 +51,17 @@ namespace SerialData
         }
 
 
-        static public DataItem[] GetNormalDataItems(int product_id, int site_id)
+        static public DataItem[] GetNormalDataItems(int product_id, int site_id, DateTime fromDateTime)
         {
             List<DataItem> items = new List<DataItem>();
             using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
             {
-                var serials = cx.SerialNumbers.Where(s => s.ProductId == product_id && s.EuiList.ProductionSiteId == site_id).OrderBy(s => s.SerialNumber1);
+                var serials = cx.SerialNumbers.
+                    Where(s => s.ProductId == product_id && 
+                        s.EuiList.ProductionSiteId == site_id &&
+                        (s.CreateDate > fromDateTime || s.UpdateDate > fromDateTime)).
+                    OrderBy(s => s.SerialNumber1);
+
                 var serial_array = serials.Select(s => new { s.SerialNumber1, s.CreateDate, s.UpdateDate });
 
                 foreach (var s in serial_array)
@@ -76,12 +81,17 @@ namespace SerialData
             return items.ToArray();
         }
 
-        static public DataItem[] GetLowesDataItems(int site_id)
+        static public DataItem[] GetLowesDataItems(int site_id, DateTime fromDateTime)
         {
             List<DataItem> items = new List<DataItem>();
             using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
             {
-                var serials = cx.LowesHubs.GroupBy(s => s.smt_serial).Select(s => s.OrderByDescending(x => x.date).FirstOrDefault()).Select(s => new { s.smt_serial, s.date });
+                var serials = cx.LowesHubs.
+                    Where(s => s.date > fromDateTime).
+                    GroupBy(s => s.smt_serial).
+                    Select(s => s.OrderByDescending(x => x.date).FirstOrDefault()).
+                    Select(s => new { s.smt_serial, s.date });
+
                 foreach (var s in serials)
                 {
                     DataItem item = new DataItem();
@@ -96,9 +106,9 @@ namespace SerialData
             return items.ToArray();
         }
 
-        static public DataItem[] DataItemsToCSV(int product_id, int site_id, string file_path)
+        static public DataItem[] DataItemsToCSV(int product_id, int site_id, string file_path, DateTime fromDatetIme)
         {
-            DataItem[] items = GetDataItems(product_id, site_id);
+            DataItem[] items = GetDataItems(product_id, site_id, fromDatetIme);
 
             using (StreamWriter sw = new StreamWriter(file_path))
             {

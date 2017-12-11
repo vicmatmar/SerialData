@@ -27,5 +27,10 @@ namespace SerialData
         [Option('o', "OutputFile", Required = false,
             HelpText = "OutputFile (Defaults to SKU.csv)")]
         public string OutputFile { get; set; }
+
+        [Option('f', "FromDateTime", Required = false,
+            HelpText = "FromDateTime")]
+        public DateTime FromDateTime { get; set; }
+
     }
 }

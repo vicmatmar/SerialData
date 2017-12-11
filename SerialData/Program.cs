@@ -43,20 +43,31 @@ namespace SerialData
                 out_filename, product_id, site_id, sku);
             Console.WriteLine(line);
 
-            DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, file_name);
+
+            if(File.Exists(file_name))
+            {
+                string delimiter = ",";
+
+                var s = File.ReadAllLines(file_name)
+                    .Where(l => !string.IsNullOrEmpty(l))
+                    .Select(l => l.Split(delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries)).Skip(1).OrderByDescending(f => f[1]) ;
+
+                DateTime fromDateTime = Convert.ToDateTime(s.First().ToArray()[1]);
+
+                DataItem[] data = DataUtils.GetDataItems(product_id, site_id, fromDateTime);
+
+                using (StreamWriter sw = new StreamWriter("testc.csv"))
+                {
+                    foreach(DataItem item in data)
+                    {
+
+                    }
+                }
+            }
+
+            DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, file_name, options.FromDateTime);
 
             return 0;
-        }
-
-        static DataItem[] getDBData(int product_id, int site_id, string file_name)
-        {
-            DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, file_name);
-            foreach (var item in items)
-            {
-                string line = string.Format("{0},{1}", item.Serial, item.DateTime);
-                Console.WriteLine(line);
-            }
-            return items;
         }
 
     }
