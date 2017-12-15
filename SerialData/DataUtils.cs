@@ -110,10 +110,21 @@ namespace SerialData
         {
             DataItem[] items = GetDataItems(product_id, site_id, fromDatetIme);
 
-            using (StreamWriter sw = new StreamWriter(file_path))
+            DataItemsToCSV(items, file_path);
+
+            return items;
+        }
+
+        static public void DataItemsToCSV(DataItem[] items, string file_path, bool append = false, string header = "Serial,DateTime,Day")
+        {
+            using (StreamWriter sw = new StreamWriter(file_path, append))
             {
-                string line = string.Format("Serial,DateTime,Day");
-                sw.WriteLine(line);
+                string line = "";
+                if (!String.IsNullOrEmpty(header) && !append)
+                {
+                    line = string.Format(header);
+                    sw.WriteLine(line);
+                }
                 foreach (var item in items)
                 {
                     DateTime day = new DateTime(item.DateTime.Year, item.DateTime.Month, item.DateTime.Day);
@@ -122,8 +133,6 @@ namespace SerialData
                 }
                 sw.Close();
             }
-
-            return items;
         }
 
         static public string GetProductSku(int product_id)

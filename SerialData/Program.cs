@@ -44,28 +44,39 @@ namespace SerialData
             Console.WriteLine(line);
 
 
-            if(File.Exists(file_name))
+            if (File.Exists(file_name))
             {
+                // Convert file to list and sort by date
                 string delimiter = ",";
 
-                var s = File.ReadAllLines(file_name)
+                string[][] infilearray = File.ReadAllLines(file_name)
                     .Where(l => !string.IsNullOrEmpty(l))
-                    .Select(l => l.Split(delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries)).Skip(1).OrderByDescending(f => f[1]) ;
+                    .Select(l => l.Split(delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries)).Skip(1).ToArray();
 
-                DateTime fromDateTime = Convert.ToDateTime(s.First().ToArray()[1]);
-
-                DataItem[] data = DataUtils.GetDataItems(product_id, site_id, fromDateTime);
-
-                using (StreamWriter sw = new StreamWriter("testc.csv"))
+                List<DataItem> fileitems = new List<DataItem>();
+                foreach (string[] lineitem in infilearray)
                 {
-                    foreach(DataItem item in data)
-                    {
-
-                    }
+                    DataItem item = new DataItem();
+                    item.Serial = lineitem[0];
+                    item.DateTime = Convert.ToDateTime(lineitem[1]);
+                    item.Day = Convert.ToDateTime(lineitem[2]);
+                    fileitems.Add(item);
                 }
-            }
+                fileitems.Sort((s1, s2) => s2.DateTime.CompareTo(s1.DateTime));
 
-            DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, file_name, options.FromDateTime);
+                // Get items from last date
+                //DateTime fromDateTime = Convert.ToDateTime(s.First().ToArray()[1]);
+                DateTime fromDateTime = fileitems[0].DateTime + TimeSpan.FromSeconds(1);
+                DataItem[] data = DataUtils.GetDataItems(product_id, site_id, fromDateTime);
+                DataUtils.DataItemsToCSV(data, "test.csv");
+
+                // Append the rest
+                DataUtils.DataItemsToCSV(fileitems.ToArray(), "test.csv", true);
+            }
+            else
+            {
+                DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, file_name, options.FromDateTime);
+            }
 
             return 0;
         }
