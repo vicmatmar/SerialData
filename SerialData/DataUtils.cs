@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using System.IO;
 
+
+
 namespace SerialData
 {
     public class DataUtils
@@ -59,7 +61,7 @@ namespace SerialData
                 var serials = cx.SerialNumbers.
                     Where(s => s.ProductId == product_id && 
                         s.EuiList.ProductionSiteId == site_id &&
-                        (s.CreateDate > fromDateTime || s.UpdateDate > fromDateTime)).
+                        (s.CreateDate > fromDateTime || s.UpdateDate >= fromDateTime)).
                     OrderBy(s => s.SerialNumber1);
 
                 var serial_array = serials.Select(s => new { s.SerialNumber1, s.CreateDate, s.UpdateDate });
@@ -87,7 +89,7 @@ namespace SerialData
             using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
             {
                 var serials = cx.LowesHubs.
-                    Where(s => s.date > fromDateTime).
+                    Where(s => s.date >= fromDateTime).
                     GroupBy(s => s.smt_serial).
                     Select(s => s.OrderByDescending(x => x.date).FirstOrDefault()).
                     Select(s => new { s.smt_serial, s.date });
@@ -117,6 +119,10 @@ namespace SerialData
 
         static public void DataItemsToCSV(DataItem[] items, string file_path, bool append = false, string header = "Serial,DateTime,Day")
         {
+            string folder = Path.GetDirectoryName(file_path);
+            if (folder.Length > 0 && !Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
             using (StreamWriter sw = new StreamWriter(file_path, append))
             {
                 string line = "";
@@ -147,12 +153,18 @@ namespace SerialData
 
         static public int GetProductId(string product_sku)
         {
-            int id = -1;
             using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
             {
-                id = cx.Products.Where(s => s.SKU == product_sku).Single().Id;
+                return cx.Products.Where(s => s.SKU == product_sku).Single().Id;
             }
-            return id;
+        }
+
+        static public int GetSiteId(string site)
+        {
+            using (ManufacturingStore_v2Entities cx = new ManufacturingStore_v2Entities())
+            {
+                return cx.ProductionSites.Where(p => p.Name == site).Single().Id;
+            }
         }
 
     }

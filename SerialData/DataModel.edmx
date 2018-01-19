@@ -50,6 +50,20 @@
           <Property Name="EnableReadProtectOnDevice" Type="bit" Nullable="false" />
           <Property Name="BoxLabelName" Type="nvarchar(max)" />
         </EntityType>
+        <EntityType Name="ProductionSite">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="LoadRangeTest" Type="bit" Nullable="false" />
+          <Property Name="RunIct" Type="bit" Nullable="false" />
+          <Property Name="RunRangeTest" Type="bit" Nullable="false" />
+          <Property Name="LoadApplication" Type="bit" Nullable="false" />
+          <Property Name="ForceChannel" Type="bit" Nullable="false" />
+          <Property Name="Erase" Type="bit" Nullable="false" />
+          <Property Name="EnableFirmwareChange" Type="bit" Nullable="false" />
+        </EntityType>
         <EntityType Name="SerialNumber">
           <Key>
             <PropertyRef Name="SerialNumberId" />
@@ -62,6 +76,18 @@
           <Property Name="TesterId" Type="int" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" />
         </EntityType>
+        <Association Name="FK_EuiList_ProductionSite">
+          <End Role="ProductionSite" Type="Self.ProductionSite" Multiplicity="1" />
+          <End Role="EuiList" Type="Self.EuiList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductionSite">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="EuiList">
+              <PropertyRef Name="ProductionSiteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_SerialNumber_EuiList">
           <End Role="EuiList" Type="Self.EuiList" Multiplicity="1" />
           <End Role="SerialNumber" Type="Self.SerialNumber" Multiplicity="*" />
@@ -90,7 +116,12 @@
           <EntitySet Name="EuiList" EntityType="Self.EuiList" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LowesHubs" EntityType="Self.LowesHubs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductionSite" EntityType="Self.ProductionSite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SerialNumber" EntityType="Self.SerialNumber" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_EuiList_ProductionSite" Association="Self.FK_EuiList_ProductionSite">
+            <End Role="ProductionSite" EntitySet="ProductionSite" />
+            <End Role="EuiList" EntitySet="EuiList" />
+          </AssociationSet>
           <AssociationSet Name="FK_SerialNumber_EuiList" Association="Self.FK_SerialNumber_EuiList">
             <End Role="EuiList" EntitySet="EuiList" />
             <End Role="SerialNumber" EntitySet="SerialNumber" />
@@ -131,6 +162,11 @@
             <End Role="SerialNumber" EntitySet="SerialNumbers" />
           </AssociationSet>
           <EntitySet Name="LowesHubs" EntityType="ManufacturingStore_v2Model.LowesHub" />
+          <EntitySet Name="ProductionSites" EntityType="ManufacturingStore_v2Model.ProductionSite" />
+          <AssociationSet Name="FK_EuiList_ProductionSite" Association="ManufacturingStore_v2Model.FK_EuiList_ProductionSite">
+            <End Role="ProductionSite" EntitySet="ProductionSites" />
+            <End Role="EuiList" EntitySet="EuiLists" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="EuiList">
           <Key>
@@ -141,6 +177,7 @@
           <Property Name="ProductionSiteId" Type="Int32" Nullable="false" />
           <Property Name="VendorEui" Type="String" MaxLength="16" FixedLength="true" Unicode="true" />
           <NavigationProperty Name="SerialNumbers" Relationship="ManufacturingStore_v2Model.FK_SerialNumber_EuiList" FromRole="EuiList" ToRole="SerialNumber" />
+          <NavigationProperty Name="ProductionSite" Relationship="ManufacturingStore_v2Model.FK_EuiList_ProductionSite" FromRole="EuiList" ToRole="ProductionSite" />
         </EntityType>
         <Association Name="FK_SerialNumber_EuiList">
           <End Type="ManufacturingStore_v2Model.EuiList" Role="EuiList" Multiplicity="1" />
@@ -203,6 +240,33 @@
           <Property Name="operator_id" Type="Int32" />
           <Property Name="test_station_id" Type="Int32" />
         </EntityType>
+        <EntityType Name="ProductionSite">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LoadRangeTest" Type="Boolean" Nullable="false" />
+          <Property Name="RunIct" Type="Boolean" Nullable="false" />
+          <Property Name="RunRangeTest" Type="Boolean" Nullable="false" />
+          <Property Name="LoadApplication" Type="Boolean" Nullable="false" />
+          <Property Name="ForceChannel" Type="Boolean" Nullable="false" />
+          <Property Name="Erase" Type="Boolean" Nullable="false" />
+          <Property Name="EnableFirmwareChange" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="EuiLists" Relationship="ManufacturingStore_v2Model.FK_EuiList_ProductionSite" FromRole="ProductionSite" ToRole="EuiList" />
+        </EntityType>
+        <Association Name="FK_EuiList_ProductionSite">
+          <End Type="ManufacturingStore_v2Model.ProductionSite" Role="ProductionSite" Multiplicity="1" />
+          <End Type="ManufacturingStore_v2Model.EuiList" Role="EuiList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductionSite">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="EuiList">
+              <PropertyRef Name="ProductionSiteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -266,6 +330,21 @@
                 <ScalarProperty Name="hw_ver" ColumnName="hw_ver" />
                 <ScalarProperty Name="smt_serial" ColumnName="smt_serial" />
                 <ScalarProperty Name="mac_id" ColumnName="mac_id" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductionSites">
+            <EntityTypeMapping TypeName="ManufacturingStore_v2Model.ProductionSite">
+              <MappingFragment StoreEntitySet="ProductionSite">
+                <ScalarProperty Name="EnableFirmwareChange" ColumnName="EnableFirmwareChange" />
+                <ScalarProperty Name="Erase" ColumnName="Erase" />
+                <ScalarProperty Name="ForceChannel" ColumnName="ForceChannel" />
+                <ScalarProperty Name="LoadApplication" ColumnName="LoadApplication" />
+                <ScalarProperty Name="RunRangeTest" ColumnName="RunRangeTest" />
+                <ScalarProperty Name="RunIct" ColumnName="RunIct" />
+                <ScalarProperty Name="LoadRangeTest" ColumnName="LoadRangeTest" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

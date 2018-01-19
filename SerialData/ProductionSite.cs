@@ -12,21 +12,25 @@ namespace SerialData
     using System;
     using System.Collections.Generic;
     
-    public partial class EuiList
+    public partial class ProductionSite
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public EuiList()
+        public ProductionSite()
         {
-            this.SerialNumbers = new HashSet<SerialNumber>();
+            this.EuiLists = new HashSet<EuiList>();
         }
     
         public int Id { get; set; }
-        public string EUI { get; set; }
-        public int ProductionSiteId { get; set; }
-        public string VendorEui { get; set; }
+        public string Name { get; set; }
+        public bool LoadRangeTest { get; set; }
+        public bool RunIct { get; set; }
+        public bool RunRangeTest { get; set; }
+        public bool LoadApplication { get; set; }
+        public bool ForceChannel { get; set; }
+        public bool Erase { get; set; }
+        public bool EnableFirmwareChange { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SerialNumber> SerialNumbers { get; set; }
-        public virtual ProductionSite ProductionSite { get; set; }
+        public virtual ICollection<EuiList> EuiLists { get; set; }
     }
 }

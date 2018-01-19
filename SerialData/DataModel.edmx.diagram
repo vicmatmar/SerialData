@@ -11,6 +11,8 @@
         <EntityTypeShape EntityType="ManufacturingStore_v2Model.Product" Width="1.5" PointX="3.25" PointY="0.75" />
         <AssociationConnector Association="ManufacturingStore_v2Model.FK_SerialNumber_Product" />
         <EntityTypeShape EntityType="ManufacturingStore_v2Model.LowesHub" Width="1.5" PointX="5.375" PointY="0.75" />
+        <EntityTypeShape EntityType="ManufacturingStore_v2Model.ProductionSite" Width="1.5" PointX="0.75" PointY="6.75" />
+        <AssociationConnector Association="ManufacturingStore_v2Model.FK_EuiList_ProductionSite" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

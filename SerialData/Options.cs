@@ -12,17 +12,13 @@ namespace SerialData
 {
     class Options
     {
-        [Option('p', "ProductId", Required = false, DefaultValue = -1, MutuallyExclusiveSet = "product",
-            HelpText = "ProductId")]
-        public int ProductId { get; set; }
-
-        [Option('k', "ProductSku", Required = false, MutuallyExclusiveSet = "product",
+        [Option('k', "ProductSku", Required = true,
             HelpText = "ProductSku")]
         public string ProductSku { get; set; }
 
-        [Option('s', "SiteId", Required = true,
-            HelpText = "SiteId")]
-        public int SiteId { get; set; }
+        [Option('s', "Site", Required = true,
+            HelpText = "Site")]
+        public string Site { get; set; }
 
         [Option('o', "OutputFile", Required = false,
             HelpText = "OutputFile (Defaults to SKU.csv)")]

@@ -25,31 +25,24 @@ namespace SerialData
                 return -1;
             }
 
-            int product_id = options.ProductId;
-            if(product_id < 0)
-            {
-                product_id = DataUtils.GetProductId(options.ProductSku);
-            }
-            int site_id = options.SiteId;
+            int product_id = DataUtils.GetProductId(options.ProductSku);
+            int site_id = DataUtils.GetSiteId(options.Site);
+
             string out_filename = options.OutputFile;
-
-            string sku = DataUtils.GetProductSku(product_id);
-
             if(out_filename == null || out_filename == "")
-                out_filename = string.Format("{0}.csv", sku);
-            string file_name = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), out_filename);
+                out_filename = string.Format("{0}.csv", options.ProductSku);
 
-            String line = string.Format("Creating {0} for product/site {1}/{2}, sku {3}", 
-                out_filename, product_id, site_id, sku);
-            Console.WriteLine(line);
+            String info = string.Format("outfile={0}, product/site={1}({2})/{3}({4})",
+                out_filename, options.ProductSku, product_id, options.Site, site_id);
 
-
-            if (File.Exists(file_name))
+            if (File.Exists(out_filename))
             {
+                Console.WriteLine("Processing existing file. " + info);
+
                 // Convert file to list and sort by date
                 string delimiter = ",";
 
-                string[][] infilearray = File.ReadAllLines(file_name)
+                string[][] infilearray = File.ReadAllLines(out_filename)
                     .Where(l => !string.IsNullOrEmpty(l))
                     .Select(l => l.Split(delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries)).Skip(1).ToArray();
 
@@ -63,19 +56,39 @@ namespace SerialData
                     fileitems.Add(item);
                 }
                 fileitems.Sort((s1, s2) => s2.DateTime.CompareTo(s1.DateTime));
+                Console.WriteLine("Processed length = {0}", fileitems.Count());
 
-                // Get items from last date
+                // Get item from last date
                 //DateTime fromDateTime = Convert.ToDateTime(s.First().ToArray()[1]);
                 DateTime fromDateTime = fileitems[0].DateTime + TimeSpan.FromSeconds(1);
                 DataItem[] data = DataUtils.GetDataItems(product_id, site_id, fromDateTime);
-                DataUtils.DataItemsToCSV(data, "test.csv");
 
-                // Append the rest
-                DataUtils.DataItemsToCSV(fileitems.ToArray(), "test.csv", true);
+                Console.WriteLine("Update length = {0}", data.Length);
+                if (data.Length > 0)
+                {
+                    fileitems.AddRange(data);
+
+                    // Remove duplicates
+                    // Asume data already ordered by date
+                    // We group by serial and pick first in the group
+                    data = fileitems.GroupBy(f => f.Serial).Select(f => f.FirstOrDefault()).OrderByDescending(f=>f.DateTime).ToArray();
+
+                    string tempfile = "temp_" + options.ProductSku + ".csv";
+                    DataUtils.DataItemsToCSV(data, tempfile);
+
+                    // Write to file
+                    DataUtils.DataItemsToCSV(fileitems.ToArray(), tempfile, append:false);
+
+                    File.Delete(out_filename);
+                    File.Move(tempfile, out_filename);
+                    //File.Copy(tempfile, out_filename);
+                }
             }
             else
             {
-                DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, file_name, options.FromDateTime);
+                Console.WriteLine("Crating file. " + info);
+                DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, out_filename, options.FromDateTime);
+                Console.WriteLine("Data length = {0}", items.Count());
             }
 
             return 0;

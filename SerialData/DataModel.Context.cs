@@ -29,5 +29,6 @@ namespace SerialData
         public virtual DbSet<EuiList> EuiLists { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<LowesHub> LowesHubs { get; set; }
+        public virtual DbSet<ProductionSite> ProductionSites { get; set; }
     }
 }
