@@ -100,7 +100,7 @@
       <DependentUpon>DataModel.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
-    <None Include="Sheets\Products.xlsm">
+    <None Include="Products.xlsm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
