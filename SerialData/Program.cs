@@ -71,7 +71,7 @@ namespace SerialData
                     // Remove duplicates
                     // Asume data already ordered by date
                     // We group by serial and pick first in the group
-                    data = fileitems.GroupBy(f => f.Serial).Select(f => f.FirstOrDefault()).OrderByDescending(f=>f.DateTime).ToArray();
+                    data = fileitems.GroupBy(f => f.Serial).Select(f => f.FirstOrDefault()).OrderByDescending(f=>f.DateTime).OrderByDescending(f=>f.DateTime).ToArray();
 
                     string tempfile = "temp_" + options.ProductSku + ".csv";
                     DataUtils.DataItemsToCSV(data, tempfile);
