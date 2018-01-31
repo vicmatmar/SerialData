@@ -28,6 +28,10 @@ namespace SerialData
             int product_id = DataUtils.GetProductId(options.ProductSku);
             int site_id = DataUtils.GetSiteId(options.Site);
 
+            int site_id2 = -1;
+            if(options.Site == "Centralite")
+                site_id2 = DataUtils.GetSiteId("Centralite - SMT");
+
             string out_filename = options.OutputFile;
             if(out_filename == null || out_filename == "")
                 out_filename = string.Format("{0}.csv", options.ProductSku);
@@ -62,6 +66,11 @@ namespace SerialData
                 //DateTime fromDateTime = Convert.ToDateTime(s.First().ToArray()[1]);
                 DateTime fromDateTime = fileitems[0].DateTime + TimeSpan.FromSeconds(1);
                 DataItem[] data = DataUtils.GetDataItems(product_id, site_id, fromDateTime);
+                if (site_id2 >= 0)
+                {
+                    DataItem[] data2 = DataUtils.GetDataItems(product_id, site_id2, fromDateTime);
+                    data = data.Concat(data2).OrderByDescending(i => i.DateTime).ToArray();
+                }
 
                 Console.WriteLine("Update length = {0}", data.Length);
                 if (data.Length > 0)
@@ -69,7 +78,7 @@ namespace SerialData
                     fileitems.AddRange(data);
 
                     // Remove duplicates
-                    // Asume data already ordered by date
+                    // Assume data already ordered by date
                     // We group by serial and pick first in the group
                     data = fileitems.GroupBy(f => f.Serial).Select(f => f.FirstOrDefault()).OrderByDescending(f=>f.DateTime).OrderByDescending(f=>f.DateTime).ToArray();
 
@@ -87,8 +96,20 @@ namespace SerialData
             else
             {
                 Console.WriteLine("Crating file. " + info);
-                DataItem[] items = DataUtils.DataItemsToCSV(product_id, site_id, out_filename, options.FromDateTime);
-                Console.WriteLine("Data length = {0}", items.Count());
+
+                DataItem[] data = DataUtils.GetDataItems(product_id, site_id, options.FromDateTime);
+                if (site_id2 >= 0)
+                {
+                    DataItem[] data2 = DataUtils.GetDataItems(product_id, site_id2, options.FromDateTime);
+                    data = data.Concat(data2).OrderByDescending(i => i.DateTime).ToArray();
+                }
+                if (data.Length > 0)
+                {
+                    data = data.GroupBy(f => f.Serial).Select(f => f.FirstOrDefault()).OrderByDescending(f => f.DateTime).OrderByDescending(f => f.DateTime).ToArray();
+                    DataUtils.DataItemsToCSV(data, out_filename, append: false);
+                }
+
+                Console.WriteLine("Data length = {0}", data.Count());
             }
 
             return 0;
